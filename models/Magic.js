@@ -4,20 +4,11 @@ import { View, FlatList, Image, TouchableOpacity, Dimensions } from 'react-nativ
 class Magic extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = {};
+		this.state = {
+			count: null,
+			type: null
+		};
 	}
-
-	start = () => {
-		console.log('start');
-	};
-
-	stop = () => {
-		console.log('stop');
-	};
-
-	end = () => {
-		console.log('end');
-	};
 
 	render() {
 		return <View />;

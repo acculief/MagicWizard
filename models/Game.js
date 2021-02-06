@@ -1,5 +1,8 @@
 import React from 'react';
 import { View, FlatList, Image, TouchableOpacity, Dimensions } from 'react-native';
+import Rule from './Rule';
+import Person from './Person';
+import Magic from './Magic';
 
 class Game extends React.Component {
 	constructor(props) {
@@ -20,7 +23,19 @@ class Game extends React.Component {
 	};
 
 	render() {
-		return <View />;
+		return (
+			<View>
+				<Rule>
+					<Person player={1}>
+						<Magic />
+					</Person>
+					<Person player={2}>
+						<Magic />
+					</Person>
+				</Rule>
+				{this.props.children}
+			</View>
+		);
 	}
 }
 

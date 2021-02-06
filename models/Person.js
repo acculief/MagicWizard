@@ -5,15 +5,9 @@ class Person extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			person1: {
-				hp: 40,
-				role: null
-			},
-			person2: {
-				hp: 40,
-				role: null
-			},
-			currentperson: null
+			hp: 40,
+			role: null,
+			player: null
 		};
 	}
 
