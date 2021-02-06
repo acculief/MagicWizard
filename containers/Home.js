@@ -116,14 +116,28 @@ class Home extends React.Component {
 				word: null
 			}));
 		}
-
-		if (this.state.person1.magic.type !== null && this.state.person2.magic.type !== null) {
-			this.setState({
-				fase: 'battle'
-			});
-		}
 	};
 
+	spellButtoon = () => {
+		if (this.state.person1.magic.type !== null && this.state.person2.magic.type !== null) {
+			return (
+				<TouchableOpacity
+					onPress={() =>
+						this.setState({
+							fase: 'battle'
+						})}
+				>
+					<Text>バトル！</Text>
+				</TouchableOpacity>
+			);
+		} else {
+			return (
+				<TouchableOpacity onPress={() => this.spellMagic(this.state.word)}>
+					<Text>呪文を唱える</Text>
+				</TouchableOpacity>
+			);
+		}
+	};
 	proceedGame = async () => {
 		// 両者のどちらかのHPが0になるまで
 		// while (this.state.person1.hp != 0 || this.state.person2.hp != 0) {
@@ -173,9 +187,7 @@ class Home extends React.Component {
 						autoFocus={true}
 						value={this.state.word}
 					/>
-					<TouchableOpacity onPress={() => this.spellMagic(this.state.word)}>
-						<Text>呪文を唱える</Text>
-					</TouchableOpacity>
+					{this.spellButtoon()}
 				</View>
 			);
 		} else if (this.state.fase === 'battle') {
