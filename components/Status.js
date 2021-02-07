@@ -1,13 +1,19 @@
-import React, { Component } from 'react';
-import { Dimensions, View, StyleSheet, TouchableOpacity, Image, FlatList } from 'react-native';
+import React from 'react';
+import { Text, View, FlatList, Image, TouchableOpacity, Dimensions } from 'react-native';
 
-class Status extends Component {
+class Status extends React.Component {
 	constructor(props) {
 		super(props);
 	}
 
 	render() {
-		return <View />;
+		return (
+			<View>
+				<Text>
+					Person1 hp:{this.props.hp} role:{this.props.role}
+				</Text>
+			</View>
+		);
 	}
 }
 

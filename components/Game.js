@@ -2,7 +2,7 @@ import React from 'react';
 import { View, FlatList, Image, TouchableOpacity, Dimensions } from 'react-native';
 import Rule from './Rule';
 import Person from './Person';
-import Magic from './Magic';
+import Magic from '../models/Magic';
 
 class Game extends React.Component {
 	constructor(props) {

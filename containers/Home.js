@@ -1,8 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import * as React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, TextInput, TouchableHighlightBase } from 'react-native';
-import Game from '../models/Game';
-import Damage from '../models/Damage';
+import Magic from '../models/Magic';
 import Status from '../components/Status';
 
 class Home extends React.Component {
@@ -77,7 +76,7 @@ class Home extends React.Component {
 
 	spellMagic = (word) => {
 		if (this.state.person1.magic.type === null) {
-			const magic = new Damage().calculate(word, this.state.person1.role);
+			const magic = new Magic(word, this.state.person1.role);
 			this.setState((prevState) => ({
 				person1: {
 					...prevState.person1,
@@ -91,7 +90,7 @@ class Home extends React.Component {
 			}));
 		} else if (this.state.person2.magic.type === null) {
 			// wordを唱える
-			const magic = new Damage().calculate(word, this.state.person1.role);
+			const magic = new Magic(word, this.state.person1.role);
 			this.setState((prevState) => ({
 				person2: {
 					...prevState.person2,
@@ -212,9 +211,9 @@ class Home extends React.Component {
 	render() {
 		return (
 			<View>
-				<Status />;
-				<Status />;
 				{this.faseUI()}
+				<Status hp={this.state.person1.hp} role={this.state.person1.role} />
+				<Status hp={this.state.person1.hp} role={this.state.person1.role} />
 			</View>
 		);
 	}
