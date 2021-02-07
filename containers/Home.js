@@ -1,7 +1,9 @@
 import { StatusBar } from 'expo-status-bar';
 import * as React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, TextInput } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, TextInput, TouchableHighlightBase } from 'react-native';
 import Game from '../models/Game';
+import Damage from '../models/Damage';
+import Status from '../components/Status';
 
 class Home extends React.Component {
 	constructor(props) {
@@ -41,23 +43,12 @@ class Home extends React.Component {
 			} else if (this.state.fase === 'input') {
 				console.log(this.state.fase);
 			} else if (this.state.fase === 'battle') {
+				this.startBattle();
 				// this.setState({ fase: 'changeAsign' });
 				console.log(this.state.fase);
 			}
 		}
 	}
-
-	start = () => {
-		console.log('start');
-	};
-
-	stop = () => {
-		console.log('stop');
-	};
-
-	end = () => {
-		console.log('end');
-	};
 
 	changeAsign = () => {
 		new Promise((resolve) => {
@@ -86,31 +77,28 @@ class Home extends React.Component {
 
 	spellMagic = (word) => {
 		if (this.state.person1.magic.type === null) {
-			const count = 10;
-			const type = 'counter';
-			// wordを唱える
+			const magic = new Damage().calculate(word, this.state.person1.role);
 			this.setState((prevState) => ({
 				person1: {
 					...prevState.person1,
 					magic: {
-						word: word,
-						count: count,
-						type: type
+						word: magic.word,
+						count: magic.count,
+						type: magic.type
 					}
 				},
 				word: null
 			}));
 		} else if (this.state.person2.magic.type === null) {
 			// wordを唱える
-			const count = 15;
-			const type = 'atack';
+			const magic = new Damage().calculate(word, this.state.person1.role);
 			this.setState((prevState) => ({
 				person2: {
 					...prevState.person2,
 					magic: {
-						word: word,
-						count: count,
-						type: type
+						word: magic.word,
+						count: magic.count,
+						type: magic.type
 					}
 				},
 				word: null
@@ -138,16 +126,26 @@ class Home extends React.Component {
 			);
 		}
 	};
-	proceedGame = async () => {
-		// 両者のどちらかのHPが0になるまで
-		// while (this.state.person1.hp != 0 || this.state.person2.hp != 0) {
-		console.log('処理を始めるよ！');
-		await this.changeAsign();
-		// console.log()
-		// }
+
+	startBattle = async () => {
+		const person1Magic = this.state.person1.magic;
+		const person2Magic = this.state.person2.magic;
+		await new Promise((resolve) => setTimeout(resolve, 3000));
+		this.setState({ log: `person1さんの魔法:「${person1Magic.word}!（威力${person1Magic.count}、種類:${person1Magic.type}）` });
+		await new Promise((resolve) => setTimeout(resolve, 3000));
+		this.setState({ log: `person2さんの魔法「${person2Magic.word}!(威力${person2Magic.count}、種類:${person2Magic.type})` });
+
+		// blockerにatackerのダメージ！（counterの場合は例外）
+		// それぞれの残りHP表示
+		// ターン交代
 	};
 
-	render() {
+	proceedGame = async () => {
+		console.log('処理を始めるよ！');
+		await this.changeAsign();
+	};
+
+	faseUI = () => {
 		if (this.state.fase === 'changeAsign') {
 			return (
 				<View>
@@ -165,16 +163,12 @@ class Home extends React.Component {
 				<View>
 					<Text>呪文詠唱</Text>
 					<Text style={{ marginVertical: 15 }}>
-						Person1 hp:{this.state.person1.hp} role:{this.state.person1.role}
-						{'\n'}
 						magic-word: {this.state.person1.magic.word}
 						{'\n'}
 						magic-type: {this.state.person1.magic.type} magic-count: {this.state.person1.magic.count}
 					</Text>
 
 					<Text style={{ marginVertical: 15 }}>
-						Person2 hp:{this.state.person2.hp} role:{this.state.person2.role}
-						{'\n'}
 						magic-word: {this.state.person2.magic.word}
 						{'\n'}
 						magic-type: {this.state.person2.magic.type} magic-count: {this.state.person2.magic.count}
@@ -209,9 +203,20 @@ class Home extends React.Component {
 						{'\n'}
 						magic-type: {this.state.person2.magic.type} magic-count: {this.state.person2.magic.count}
 					</Text>
+
+					<Text>{this.state.log}</Text>
 				</View>
 			);
 		}
+	};
+	render() {
+		return (
+			<View>
+				<Status />;
+				<Status />;
+				{this.faseUI()}
+			</View>
+		);
 	}
 }
 
