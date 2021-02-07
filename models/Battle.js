@@ -37,8 +37,10 @@ class Battle {
             }
         } else if (attackerType == TYPE_HEAL) {
             // 相手のタイプ関係なく回復
-            totalDamage = magicOfAttacker.count * (-1);
-            damageTo = ROLE_ATTACKER;
+            if (0 < magicOfAttacker.count) {
+                totalDamage = magicOfAttacker.count * (-1);
+                damageTo = ROLE_ATTACKER;
+            }
         }
         return { totalDamage: totalDamage, damageTo: damageTo }
     }
