@@ -1,13 +1,12 @@
-
-class Damage {
-    constructor() {
-        this.MAX_PARCENT = 100;
-        this.DEFAULT_DAMAGE = 5;
-        this.magic = { 
+class Magic {
+    constructor(word, role) {
+        this._MAX_PARCENT = 100;
+        this._DEFAULT_DAMAGE = 5;
+        this._magic = { 
             'attacker': ['attack', 'heal'],
             'blocker': ['counter', 'block']
         }
-        this.damage = {
+        this._damage = {
             low: {
                 probability: 5,
                 min: -5,
@@ -34,30 +33,31 @@ class Damage {
                 max: 10
             }
         };
+        return this._create(word, role);
     }
 
     /**
-     * ダメージ算出処理
+     * 魔法生成
      * 
      * @param {String} word 魔法の呪文 
      * @param {String} role 攻撃: 'attacker' 防御: 'blocker' 
      * @returns {String, Integer, String} magic
      */
-    calculate(word, role) {
-        let random = Math.random() * (this.MAX_PARCENT + 1);
-        let damage = this.damage;
+    _create(word, role) {
+        let random = Math.random() * (this._MAX_PARCENT + 1);
+        let damage = this._damage;
         let probability = 0;
         for (let key in damage) {
             probability += damage[key].probability;
             if (probability >= random) {
-                var count = this.DEFAULT_DAMAGE + Math.floor(Math.random() * (damage[key].max + 1 - damage[key].min) + damage[key].min);
+                var count = this._DEFAULT_DAMAGE + Math.floor(Math.random() * (damage[key].max + 1 - damage[key].min) + damage[key].min);
                 let typeRandom = Math.floor(Math.random() * (2));
-                let type = this.magic[role][typeRandom];
+                let type = this._magic[role][typeRandom];
                 return {word, count, type};
             }
         }
     }
 }
 
-export default Damage;
+export default Magic;
 
