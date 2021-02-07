@@ -2,6 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import * as React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, TextInput, TouchableHighlightBase } from 'react-native';
 import Magic from '../models/Magic';
+import Battle from '../models/Battle';
 import Status from '../components/Status';
 
 class Home extends React.Component {
@@ -10,6 +11,7 @@ class Home extends React.Component {
 		this.state = {
 			fase: 'changeAsign',
 			person1: {
+				name: 'ビショップ',
 				hp: 40,
 				role: 'attacker',
 				magic: {
@@ -19,6 +21,7 @@ class Home extends React.Component {
 				}
 			},
 			person2: {
+				name: 'メイジ',
 				hp: 40,
 				role: 'blocker',
 				magic: {
@@ -34,9 +37,10 @@ class Home extends React.Component {
 		this.proceedGame();
 	}
 
-	componentDidUpdate(prevProps, prevState) {
+	componentDidUpdate = async (prevProps, prevState) => {
 		if (prevState.fase !== this.state.fase) {
 			if (this.state.fase === 'changeAsign') {
+				this.changeAsign();
 				this.setState({ fase: 'input' });
 				console.log(this.state.fase);
 			} else if (this.state.fase === 'input') {
@@ -47,7 +51,7 @@ class Home extends React.Component {
 				console.log(this.state.fase);
 			}
 		}
-	}
+	};
 
 	changeAsign = () => {
 		new Promise((resolve) => {
@@ -90,7 +94,7 @@ class Home extends React.Component {
 			}));
 		} else if (this.state.person2.magic.type === null) {
 			// wordを唱える
-			const magic = new Magic(word, this.state.person1.role);
+			const magic = new Magic(word, this.state.person2.role);
 			this.setState((prevState) => ({
 				person2: {
 					...prevState.person2,
@@ -127,13 +131,83 @@ class Home extends React.Component {
 	};
 
 	startBattle = async () => {
-		const person1Magic = this.state.person1.magic;
-		const person2Magic = this.state.person2.magic;
-		await new Promise((resolve) => setTimeout(resolve, 3000));
-		this.setState({ log: `person1さんの魔法:「${person1Magic.word}!（威力${person1Magic.count}、種類:${person1Magic.type}）` });
-		await new Promise((resolve) => setTimeout(resolve, 3000));
-		this.setState({ log: `person2さんの魔法「${person2Magic.word}!(威力${person2Magic.count}、種類:${person2Magic.type})` });
+		let attacker = undefined;
+		let blocker = undefined;
 
+		if (this.state.person1.role === 'attacker') {
+			attacker = this.state.person1;
+			attacker = Object.assign(attacker, { who: 'person1' });
+		} else if (this.state.person1.role === 'blocker') {
+			blocker = this.state.person1;
+			blocker = Object.assign(blocker, { who: 'person1' });
+		}
+		if (this.state.person2.role === 'attacker') {
+			attacker = this.state.person2;
+			attacker = Object.assign(attacker, { who: 'person2' });
+		} else if (this.state.person2.role === 'blocker') {
+			blocker = this.state.person2;
+			blocker = Object.assign(blocker, { who: 'person2' });
+		}
+
+		await new Promise((resolve) => setTimeout(resolve, 3000));
+		this.setState({
+			log: [
+				this.state.log,
+				`\n${attacker.name}さんの魔法:「${attacker.magic.word}!（威力${attacker.magic.count}、種類:${attacker.magic.type}）`
+			]
+		});
+		await new Promise((resolve) => setTimeout(resolve, 3000));
+		this.setState({
+			log: [
+				this.state.log,
+				`\n${blocker.name}さんの魔法:「${blocker.magic.word}!（威力${blocker.magic.count}、種類:${blocker.magic.type}）`
+			]
+		});
+
+		let damageInfo = new Battle().calculate(attacker.magic, blocker.magic);
+		this.setState({
+			damageInfo: damageInfo
+		});
+		console.log(this.state.damageInfo.totalDamage);
+		console.log(this.state.damageInfo.damageTo);
+
+		if (this.state.damageInfo.damageTo === 'attacker') {
+			this.setState((prevState) => ({
+				[attacker.who]: {
+					...prevState[attacker.who],
+					hp: this.state[attacker.who].hp - this.state.damageInfo.totalDamage
+				}
+			}));
+		} else if (this.state.damageInfo.damageTo === 'blocker') {
+			this.setState((prevState) => ({
+				[blocker.who]: {
+					...prevState[blocker.who],
+					hp: this.state[blocker.who].hp - this.state.damageInfo.totalDamage
+				}
+			}));
+		}
+		await new Promise((resolve) => setTimeout(resolve, 3000));
+		this.setState((prevState) => ({
+			person1: {
+				...prevState.person1,
+				magic: {
+					word: null,
+					count: null,
+					type: null
+				}
+			},
+			person2: {
+				...prevState.person2,
+				magic: {
+					word: null,
+					count: null,
+					type: null
+				}
+			}
+		}));
+		this.setState({
+			fase: 'changeAsign'
+		});
 		// blockerにatackerのダメージ！（counterの場合は例外）
 		// それぞれの残りHP表示
 		// ターン交代
@@ -212,8 +286,10 @@ class Home extends React.Component {
 		return (
 			<View>
 				{this.faseUI()}
-				<Status hp={this.state.person1.hp} role={this.state.person1.role} />
-				<Status hp={this.state.person1.hp} role={this.state.person1.role} />
+				<View style={{ marginTop: 40 }}>
+					<Status name={this.state.person1.name} hp={this.state.person1.hp} role={this.state.person1.role} />
+					<Status name={this.state.person2.name} hp={this.state.person2.hp} role={this.state.person2.role} />
+				</View>
 			</View>
 		);
 	}
