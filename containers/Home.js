@@ -1,9 +1,14 @@
 import { StatusBar } from 'expo-status-bar';
 import * as React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, TextInput, TouchableHighlightBase } from 'react-native';
+import { Dimensions, Text, View, TouchableOpacity, TextInput, TouchableHighlightBase } from 'react-native';
 import Magic from '../models/Magic';
 import Battle from '../models/Battle';
 import Status from '../components/Status';
+import styles from '../assets/styles';
+import SpellInput from '../components/SpellInput';
+import SpellButton from '../components/SpellButton';
+import CurrentFaseBadge from '../components/CurrentFaseBadge';
+import BattleButton from '../components/BattleButton';
 
 class Home extends React.Component {
 	constructor(props) {
@@ -29,7 +34,8 @@ class Home extends React.Component {
 					count: null,
 					type: null
 				}
-			}
+			},
+			currentPerson: null
 		};
 	}
 
@@ -47,7 +53,6 @@ class Home extends React.Component {
 				console.log(this.state.fase);
 			} else if (this.state.fase === 'battle') {
 				this.startBattle();
-				// this.setState({ fase: 'changeAsign' });
 				console.log(this.state.fase);
 			}
 		}
@@ -64,22 +69,15 @@ class Home extends React.Component {
 					...prevState.person2,
 					role: prevState.person2.role === 'attacker' ? 'blocker' : 'attacker'
 				},
-				fase: 'input'
+				fase: 'input',
+				currentPerson: prevState.person1.role === 'blocker' ? 'person1' : 'person2'
 			}));
 			resolve('succes!!');
 		});
 	};
 
-	input = () => {
-		console.log('stop');
-	};
-
-	batle = () => {
-		console.log('end');
-	};
-
 	spellMagic = (word) => {
-		if (this.state.person1.magic.type === null) {
+		if (this.state.currentPerson === 'person1') {
 			const magic = new Magic(word, this.state.person1.role);
 			this.setState((prevState) => ({
 				person1: {
@@ -90,9 +88,10 @@ class Home extends React.Component {
 						type: magic.type
 					}
 				},
-				word: null
+				word: null,
+				currentPerson: 'person2'
 			}));
-		} else if (this.state.person2.magic.type === null) {
+		} else if (this.state.currentPerson === 'person2') {
 			// wordを唱える
 			const magic = new Magic(word, this.state.person2.role);
 			this.setState((prevState) => ({
@@ -104,29 +103,9 @@ class Home extends React.Component {
 						type: magic.type
 					}
 				},
-				word: null
+				word: null,
+				currentPerson: 'person1'
 			}));
-		}
-	};
-
-	spellButtoon = () => {
-		if (this.state.person1.magic.type !== null && this.state.person2.magic.type !== null) {
-			return (
-				<TouchableOpacity
-					onPress={() =>
-						this.setState({
-							fase: 'battle'
-						})}
-				>
-					<Text>バトル！</Text>
-				</TouchableOpacity>
-			);
-		} else {
-			return (
-				<TouchableOpacity onPress={() => this.spellMagic(this.state.word)}>
-					<Text>呪文を唱える</Text>
-				</TouchableOpacity>
-			);
 		}
 	};
 
@@ -171,19 +150,22 @@ class Home extends React.Component {
 		console.log(this.state.damageInfo.totalDamage);
 		console.log(this.state.damageInfo.damageTo);
 
+		await new Promise((resolve) => setTimeout(resolve, 3000));
 		if (this.state.damageInfo.damageTo === 'attacker') {
 			this.setState((prevState) => ({
 				[attacker.who]: {
 					...prevState[attacker.who],
 					hp: this.state[attacker.who].hp - this.state.damageInfo.totalDamage
-				}
+				},
+				log: [ this.state.log, `\n${this.state[attacker.who].name}さんに${damageInfo.totalDamage}のダメージ！` ]
 			}));
 		} else if (this.state.damageInfo.damageTo === 'blocker') {
 			this.setState((prevState) => ({
 				[blocker.who]: {
 					...prevState[blocker.who],
 					hp: this.state[blocker.who].hp - this.state.damageInfo.totalDamage
-				}
+				},
+				log: [ this.state.log, `\n${this.state[blocker.who].name}さんに${damageInfo.totalDamage}のダメージ！` ]
 			}));
 		}
 		await new Promise((resolve) => setTimeout(resolve, 3000));
@@ -223,70 +205,53 @@ class Home extends React.Component {
 			return (
 				<View>
 					<Text>ターン変更</Text>
-					<Text>
-						Person1 hp:{this.state.person1.hp} role:{this.state.person1.role}
-					</Text>
-					<Text>
-						Person2 hp:{this.state.person2.hp} role:{this.state.person2.role}
-					</Text>
 				</View>
 			);
 		} else if (this.state.fase === 'input') {
 			return (
 				<View>
-					<Text>呪文詠唱</Text>
-					<Text style={{ marginVertical: 15 }}>
-						magic-word: {this.state.person1.magic.word}
-						{'\n'}
-						magic-type: {this.state.person1.magic.type} magic-count: {this.state.person1.magic.count}
-					</Text>
+					<View style={{ height: Dimensions.get('window').height / 4 }}>
+						<BattleButton
+							person1={this.state.person1}
+							person2={this.state.person2}
+							onPress={() =>
+								this.setState({
+									fase: 'battle'
+								})}
+						/>
+					</View>
 
-					<Text style={{ marginVertical: 15 }}>
-						magic-word: {this.state.person2.magic.word}
-						{'\n'}
-						magic-type: {this.state.person2.magic.type} magic-count: {this.state.person2.magic.count}
-					</Text>
-					<TextInput
-						// style={{ flex: 1, marginLeft: 6, color: 'black' }}
-						placeholder="呪文を入力"
-						placeholderTextColor="#8E8E93"
-						onChangeText={(value) => this.setState({ word: value })}
-						autoFocus={true}
-						value={this.state.word}
-					/>
-					{this.spellButtoon()}
+					<View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 5 }}>
+						<SpellInput
+							word={this.state.word}
+							onChangeWord={(value) => this.setState({ word: value })}
+							onSubmitEditing={() => this.spellMagic(this.state.word)}
+						/>
+						<SpellButton onPress={() => this.spellMagic(this.state.word)} />
+					</View>
 				</View>
 			);
 		} else if (this.state.fase === 'battle') {
 			return (
 				<View>
-					<Text>バトル</Text>
-					<Text style={{ marginVertical: 15 }}>
-						Person1 hp:{this.state.person1.hp} role:{this.state.person1.role}
-						{'\n'}
-						magic-word: {this.state.person1.magic.word}
-						{'\n'}
-						magic-type: {this.state.person1.magic.type} magic-count: {this.state.person1.magic.count}
-					</Text>
-
-					<Text style={{ marginVertical: 15 }}>
-						Person2 hp:{this.state.person2.hp} role:{this.state.person2.role}
-						{'\n'}
-						magic-word: {this.state.person2.magic.word}
-						{'\n'}
-						magic-type: {this.state.person2.magic.type} magic-count: {this.state.person2.magic.count}
-					</Text>
-
-					<Text>{this.state.log}</Text>
+					<View style={{ height: Dimensions.get('window').height / 4 }}>
+						<Text>{this.state.log}</Text>
+					</View>
 				</View>
 			);
 		}
 	};
 	render() {
 		return (
-			<View>
+			<View style={{ backgroundColor: '#BBFFFF', height: Dimensions.get('window').height }}>
+				<CurrentFaseBadge
+					fase={this.state.fase}
+					person={this.state[this.state.currentPerson]}
+					person1={this.state.person1}
+					person2={this.state.person2}
+				/>
 				{this.faseUI()}
-				<View style={{ marginTop: 40 }}>
+				<View style={{ marginTop: 15 }}>
 					<Status name={this.state.person1.name} hp={this.state.person1.hp} role={this.state.person1.role} />
 					<Status name={this.state.person2.name} hp={this.state.person2.hp} role={this.state.person2.role} />
 				</View>

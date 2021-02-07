@@ -59,5 +59,32 @@ export default StyleSheet.create({
 		fontWeight: 'bold',
 		marginHorizontal: 5
 	},
-	roleText: {}
+	roleText: {},
+
+	// COMPONENTS - SPELLINPUT
+	textInput: {
+		width: '80%',
+		flexDirection: 'row',
+		backgroundColor: 'white',
+		height: 40,
+		borderRadius: 20,
+		alignItems: 'center',
+		paddingHorizontal: 15,
+		borderWidth: 1,
+		borderColor: 'black'
+	},
+
+	// COMPONENTS - SPELLBUTTON
+	button: {
+		width: '80%',
+		height: 30,
+		borderWidth: 1,
+		borderColor: 'black',
+		justifyContent: 'center',
+		backgroundColor: '#A4C6FF'
+	},
+	buttonText: {
+		textAlign: 'center',
+		fontWeight: 'bold'
+	}
 });
