@@ -129,7 +129,7 @@ class Home extends React.Component {
 			blocker = Object.assign(blocker, { who: 'person2' });
 		}
 
-		await new Promise((resolve) => setTimeout(resolve, 3000));
+		await new Promise((resolve) => setTimeout(resolve, 2000));
 		this.setState({
 			log: [
 				this.state.log,
@@ -137,7 +137,7 @@ class Home extends React.Component {
 			],
 			attacker: attacker
 		});
-		await new Promise((resolve) => setTimeout(resolve, 3000));
+		await new Promise((resolve) => setTimeout(resolve, 2000));
 		this.setState({
 			log: [
 				this.state.log,
@@ -146,7 +146,7 @@ class Home extends React.Component {
 			blocker: blocker
 		});
 
-		await new Promise((resolve) => setTimeout(resolve, 3000));
+		await new Promise((resolve) => setTimeout(resolve, 2000));
 		let damageInfo = new Battle().calculate(attacker.magic, blocker.magic);
 		this.setState({
 			damageInfo: damageInfo
@@ -172,7 +172,7 @@ class Home extends React.Component {
 				log: [ this.state.log, `\n${this.state[blocker.who].name}さんに${damageInfo.totalDamage}のダメージ！` ]
 			}));
 		}
-		await new Promise((resolve) => setTimeout(resolve, 3000));
+		await new Promise((resolve) => setTimeout(resolve, 2000));
 		this.setState((prevState) => ({
 			person1: {
 				...prevState.person1,
