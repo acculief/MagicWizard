@@ -1,0 +1,60 @@
+{
+    "sample": {
+        "role": {
+            "attacker": {
+                "name": "attacker",
+                "type": [
+                    {
+                        "name": "attack",
+                        "probability": 70
+                    },
+                    {
+                        "name": "heal",
+                        "probability": 30
+                    }
+                ]
+            },
+            "blocker": {
+                "name": "blocker",
+                "type": [
+                    {
+                        "name": "block",
+                        "probability": 60
+                    },
+                    {
+                        "name": "counter",
+                        "probability": 40
+                    }
+                ]
+            }
+        },
+        "default_count": 5,
+        "count": {
+            "low": {
+                "probability": 5,
+                "min": -5,
+                "max": -2
+            },
+            "middleLow": {
+                "probability": 20,
+                "min": -1,
+                "max": 0
+            },
+            "middle": {
+                "probability": 60,
+                "min": 1,
+                "max": 5
+            },
+            "middleHigh": {
+                "probability": 10,
+                "min": 6,
+                "max": 8
+            },
+            "high": {
+                "probability": 5,
+                "min": 9,
+                "max": 10
+            }
+        }
+    }
+}
