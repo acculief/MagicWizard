@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import * as React from 'react';
-import { Dimensions, Text, View, TouchableOpacity, TextInput, TouchableHighlightBase } from 'react-native';
+import { Dimensions, Text, View, TouchableOpacity, ScrollView } from 'react-native';
 import Magic from '../models/Magic';
 import Battle from '../models/Battle';
 import Status from '../components/Status';
@@ -9,6 +9,8 @@ import SpellInput from '../components/SpellInput';
 import SpellButton from '../components/SpellButton';
 import CurrentFaseBadge from '../components/CurrentFaseBadge';
 import BattleButton from '../components/BattleButton';
+import Log from '../components/Log';
+import BattleUI from '../components/BattleUI';
 
 class Home extends React.Component {
 	constructor(props) {
@@ -133,14 +135,16 @@ class Home extends React.Component {
 			log: [
 				this.state.log,
 				`\n${attacker.name}さんの魔法:「${attacker.magic.word}!（威力${attacker.magic.count}、種類:${attacker.magic.type}）`
-			]
+			],
+			attacker: attacker
 		});
 		await new Promise((resolve) => setTimeout(resolve, 3000));
 		this.setState({
 			log: [
 				this.state.log,
 				`\n${blocker.name}さんの魔法:「${blocker.magic.word}!（威力${blocker.magic.count}、種類:${blocker.magic.type}）`
-			]
+			],
+			blocker: blocker
 		});
 
 		let damageInfo = new Battle().calculate(attacker.magic, blocker.magic);
@@ -185,7 +189,9 @@ class Home extends React.Component {
 					count: null,
 					type: null
 				}
-			}
+			},
+			attacker: null,
+			blocker: null
 		}));
 		this.setState({
 			fase: 'changeAsign'
@@ -211,6 +217,7 @@ class Home extends React.Component {
 			return (
 				<View>
 					<View style={{ height: Dimensions.get('window').height / 4 }}>
+						{/* <BattleUI /> */}
 						<BattleButton
 							person1={this.state.person1}
 							person2={this.state.person2}
@@ -221,7 +228,7 @@ class Home extends React.Component {
 						/>
 					</View>
 
-					<View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 5 }}>
+					<View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 15 }}>
 						<SpellInput
 							word={this.state.word}
 							onChangeWord={(value) => this.setState({ word: value })}
@@ -235,7 +242,7 @@ class Home extends React.Component {
 			return (
 				<View>
 					<View style={{ height: Dimensions.get('window').height / 4 }}>
-						<Text>{this.state.log}</Text>
+						<BattleUI attacker={this.state.attacker} blocker={this.state.blocker} />
 					</View>
 				</View>
 			);
@@ -255,6 +262,7 @@ class Home extends React.Component {
 					<Status name={this.state.person1.name} hp={this.state.person1.hp} role={this.state.person1.role} />
 					<Status name={this.state.person2.name} hp={this.state.person2.hp} role={this.state.person2.role} />
 				</View>
+				<Log log={this.state.log} />
 			</View>
 		);
 	}
