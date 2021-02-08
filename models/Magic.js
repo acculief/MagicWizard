@@ -1,9 +1,7 @@
 import magicJson from "../json/magic.json";
 class Magic {
 	constructor(word, role) {
-		// 後々wordによって魔法を分けるためランダム魔法をsampleとする
-		const magic = magicJson.sample;
-		return this._create(word, role, sample);
+		return this._create(word, role);
 	}
 
 	/**
@@ -11,12 +9,13 @@ class Magic {
      * 
      * @param {String} word 魔法の呪文 
      * @param {String} role 攻撃: 'attacker' 防御: 'blocker' 
-     * @param {String} magic
      * @returns {String, Integer, String} magic
      */
-	_create(word, role, magic) {
-		let count = this._createCount(magic);
-		let type = this._createType(magic, role);
+	_create(word, role) {
+		// 後々wordによって魔法を分けるためランダム魔法をsampleとする
+		const randomMagic = magicJson.random;
+		let count = this._createCount(randomMagic);
+		let type = this._createType(randomMagic, role);
 		return {word, count, type};
 
 	}
