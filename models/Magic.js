@@ -1,38 +1,6 @@
+import magicJson from "../json/magic.json";
 class Magic {
 	constructor(word, role) {
-		this._MAX_PARCENT = 100;
-		this._DEFAULT_DAMAGE = 5;
-		this._magic = {
-			attacker: [ 'attack', 'heal' ],
-			blocker: [ 'counter', 'block' ]
-		};
-		this._damage = {
-			low: {
-				probability: 5,
-				min: -5,
-				max: -2
-			},
-			middleLow: {
-				probability: 20,
-				min: -1,
-				max: 0
-			},
-			middle: {
-				probability: 60,
-				min: 1,
-				max: 5
-			},
-			middleHigh: {
-				probability: 10,
-				min: 6,
-				max: 8
-			},
-			high: {
-				probability: 5,
-				min: 9,
-				max: 10
-			}
-		};
 		return this._create(word, role);
 	}
 
@@ -44,18 +12,56 @@ class Magic {
      * @returns {String, Integer, String} magic
      */
 	_create(word, role) {
-		let random = Math.random() * (this._MAX_PARCENT + 1);
-		let damage = this._damage;
+		// 後々wordによって魔法を分けるためランダム魔法をsampleとする
+		const randomMagic = magicJson.random;
+		let count = this._createCount(randomMagic);
+		let type = this._createType(randomMagic, role);
+		return {word, count, type};
+
+	}
+
+	/**
+	 * 魔法の威力を算出
+	 * 
+	 * @param {*} magic 魔法の基礎値 
+	 */
+	_createCount(magic) {
+		const DEFAULT_DAMAGE = magic.default_count;
+		let count = magic.count
 		let probability = 0;
-		for (let key in damage) {
-			probability += damage[key].probability;
-			if (probability >= random) {
-				var count =
-					this._DEFAULT_DAMAGE +
-					Math.floor(Math.random() * (damage[key].max + 1 - damage[key].min) + damage[key].min);
-				let typeRandom = Math.floor(Math.random() * 2);
-				let type = this._magic[role][typeRandom];
-				return { word, count, type };
+		let maxPercent = 0;
+		// 確率の合計値を算出
+		for (let key in count) {
+			maxPercent += count[key].probability;
+		}
+		let random = Math.random() * (maxPercent + 1);
+		for (let key in count) {
+			probability += count[key].probability;
+			if (random <= probability) {
+				return DEFAULT_DAMAGE +
+					Math.floor(Math.random() * (count[key].max + 1 - count[key].min) + count[key].min);
+			}
+		}
+	}
+	/**
+	 * 魔法の種類を算出
+	 * 
+	 * @param {*} magic 魔法の基礎値
+	 * @param {*} role 攻撃: 'attacker' 防御: 'blocker' 
+	 */
+	_createType(magic, role) {
+		let type = magic.role[role].type;
+		let probability = 0;
+		let maxPercent = 0;
+		// 確率の合計値を算出
+		for (let key in type) {
+			maxPercent += type[key].probability;
+		}
+		let random = Math.random() * (maxPercent + 1);
+		for (let key in type) {
+			probability += type[key].probability;
+			if (random <= probability) {
+				return type[key].name;
 			}
 		}
 	}
