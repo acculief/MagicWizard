@@ -1,10 +1,8 @@
-import { StatusBar } from 'expo-status-bar';
 import * as React from 'react';
-import { Dimensions, Text, View, TouchableOpacity, ScrollView } from 'react-native';
+import { Dimensions, Text, View } from 'react-native';
 import Magic from '../models/Magic';
 import Battle from '../models/Battle';
 import Status from '../components/Status';
-import styles from '../assets/styles';
 import SpellInput from '../components/SpellInput';
 import SpellButton from '../components/SpellButton';
 import CurrentFaseBadge from '../components/CurrentFaseBadge';
@@ -35,15 +33,16 @@ class Home extends React.Component {
 					word: null,
 					count: null,
 					type: null
-				}
-			},
-			currentPerson: null
+				},
+				currentPerson: null,
+				damageInfo: { damageTo: null, totalDamage: null }
+			}
 		};
 	}
 
-	componentDidMount() {
-		this.proceedGame();
-	}
+	componentDidMount = async () => {
+		await this.changeAsign();
+	};
 
 	componentDidUpdate = async (prevProps, prevState) => {
 		if (prevState.fase !== this.state.fase) {
@@ -147,6 +146,7 @@ class Home extends React.Component {
 			blocker: blocker
 		});
 
+		await new Promise((resolve) => setTimeout(resolve, 3000));
 		let damageInfo = new Battle().calculate(attacker.magic, blocker.magic);
 		this.setState({
 			damageInfo: damageInfo
@@ -154,7 +154,7 @@ class Home extends React.Component {
 		console.log(this.state.damageInfo.totalDamage);
 		console.log(this.state.damageInfo.damageTo);
 
-		await new Promise((resolve) => setTimeout(resolve, 3000));
+		// await new Promise((resolve) => setTimeout(resolve, 3000));
 		if (this.state.damageInfo.damageTo === 'attacker') {
 			this.setState((prevState) => ({
 				[attacker.who]: {
@@ -201,11 +201,6 @@ class Home extends React.Component {
 		// ターン交代
 	};
 
-	proceedGame = async () => {
-		console.log('処理を始めるよ！');
-		await this.changeAsign();
-	};
-
 	faseUI = () => {
 		if (this.state.fase === 'changeAsign') {
 			return (
@@ -242,7 +237,11 @@ class Home extends React.Component {
 			return (
 				<View>
 					<View style={{ height: Dimensions.get('window').height / 4 }}>
-						<BattleUI attacker={this.state.attacker} blocker={this.state.blocker} />
+						<BattleUI
+							attacker={this.state.attacker}
+							blocker={this.state.blocker}
+							damageInfo={this.state.damageInfo}
+						/>
 					</View>
 				</View>
 			);
