@@ -2,12 +2,12 @@
   {
     "role": "attacker",
     "name": "attack",
-    "probability": 70,
-    "word": ["アタック"],
+    "probability": 80,
+    "word": ["アタック", "ランダム"],
     "attribute": [
       {
         "name": "thunder",
-        "word": ["サンダー"],
+        "word": ["サンダー", "ランダム"],
         "default_count": 5,
         "probability": 25,
         "count": [
@@ -42,7 +42,7 @@
       },
       {
         "name": "fire",
-        "word": [],
+        "word": ["ランダム"],
         "probability": 25,
         "default_count": 5,
         "count": [
@@ -149,9 +149,9 @@
   },
   {
     "name": "heal",
-    "probability": 30,
+    "probability": 20,
     "role": "attacker",
-    "word": [],
+    "word": ["ランダム"],
     "attribute": [
       {
         "name": "heal",

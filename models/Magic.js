@@ -29,21 +29,33 @@ class Magic {
   }
 
   _generateType(word='', role) {
+    let magicIndeList = [];
+    let probability = 0;
+    let maxProbability = 0;
     // word判定
-    for (let type in magic) {
-      if (this._searchArrayWord(word, magic[type].word) !== -1 && magic[type].role === role) {
-        return magic[type];
+    for (let index in magic) {
+      if (this._searchArrayWord(word, magic[index].word) !== -1 && magic[index].role === role) {
+        magicIndeList.push(index);
+        maxProbability += magic[index].probability;
+      }
+    }
+    // 同じワードが複数の場合の判定
+    if(magicIndeList.length != 0) {
+      let random = Math.random() * (maxProbability + 1);
+      for (let index in magicIndeList) {
+        probability += magic[magicIndeList[index]].probability;
+        if (random <= probability) {
+          return magic[magicIndeList[index]];
+        }
       }
     }
     // ランダム判定
-    let probability = 0;
-    let maxPercent = 0;
     for (let type in magic) {
       if (magic[type].role === role) {
-        maxPercent += magic[type].probability;
+        maxProbability += magic[type].probability;
       }
     }
-    let random = Math.random() * (maxPercent + 1);
+    let random = Math.random() * (maxProbability + 1);
     for (let type in magic) {
       if (magic[type].role === role) {
         probability += magic[type].probability;
@@ -55,41 +67,65 @@ class Magic {
   }
 
   _generateAttribute(word='', type) {
+    let magicIndeList = [];
+    let probability = 0;
+    let maxProbability = 0;
     // word判定
-    for (let attribute in type.attribute) {
-      if (this._searchArrayWord(word, type.attribute[attribute].word) !== -1) {
-        return type.attribute[attribute];
+    for (let index in type.attribute) {
+      if (this._searchArrayWord(word, type.attribute[index].word) !== -1) {
+        magicIndeList.push(index);
+        maxProbability += type.attribute[index].probability;
+      }
+    }
+    // 同じワードが複数の場合の判定
+    if(magicIndeList.length != 0) {
+      let random = Math.random() * (maxProbability + 1);
+      for (let index in magicIndeList) {
+        probability += type.attribute[magicIndeList[index]].probability;
+        if (random <= probability) {
+          return type.attribute[magicIndeList[index]];
+        }
       }
     }
     // ランダム判定
-    let probability = 0;
-    let maxPercent = 0;
-    for (let attribute in type.attribute) {
-      maxPercent += type.attribute[attribute].probability;
+    for (let index in type.attribute) {
+      maxProbability += type.attribute[index].probability;
     }
-    let random = Math.random() * (maxPercent + 1);
-    for (let attribute in type.attribute) {
-      probability += type.attribute[attribute].probability;
+    let random = Math.random() * (maxProbability + 1);
+    for (let index in type.attribute) {
+      probability += type.attribute[index].probability;
       if (random <= probability) {
-        return type.attribute[attribute];
+        return type.attribute[index];
       }
     }
   }
 
   _generateCount(word='', attribute) {
+    let magicIndeList = [];
+    let probability = 0;
+    let maxProbability = 0;
     // word
     for (let index in attribute.count) {
       if (this._searchArrayWord(word, attribute.count[index].word) !== -1) {
-        return attribute.count[index];
+        magicIndeList.push[index];
+        maxProbability += attribute.count[index].probability;
+      }
+    }
+    // 同じワードが複数の場合の判定
+    if(magicIndeList.length != 0) {
+      let random = Math.random() * (maxProbability + 1);
+      for (let index in magicIndeList) {
+        probability += attribute.count[magicIndeList[index]].probability;
+        if (random <= probability) {
+          return attribute.count[magicIndeList[index]];
+        }
       }
     }
     // ランダム判定
-    let probability = 0;
-    let maxPercent = 0;
     for (let index in attribute.count) {
-      maxPercent += attribute.count[index].probability;
+      maxProbability += attribute.count[index].probability;
     }
-    let random = Math.random() * (maxPercent + 1);
+    let random = Math.random() * (maxProbability + 1);
     for (let index in attribute.count) {
       probability += attribute.count[index].probability;
       if (random <= probability) {
@@ -97,6 +133,7 @@ class Magic {
       }
     }
   }
+  
   _searchArrayWord(word='', arrayWord) {
     for (let target in arrayWord) {
       let result = word.indexOf(arrayWord[target]);
